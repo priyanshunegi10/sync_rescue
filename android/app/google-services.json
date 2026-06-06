@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "138225846470",
+    "project_id": "syncrescue-4b7e9",
+    "storage_bucket": "syncrescue-4b7e9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:138225846470:android:9080e12bafec49f0626fc7",
+        "android_client_info": {
+          "package_name": "com.example.sync_rescue"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzdxYdI37Wyd9zEABOMVsbgW58yNxHDKo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
