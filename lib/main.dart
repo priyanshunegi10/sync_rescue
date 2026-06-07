@@ -1,8 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:sync_rescue/features/sos_rescue/views/home_page.dart';
 import 'package:sync_rescue/firebase_options.dart';
-import 'package:sync_rescue/pages/hone_paage/home_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'synch rescue',
       theme: ThemeData(textTheme: GoogleFonts.latoTextTheme()),
-      home: const HomePage(),
+      home: HomePage(),
     );
   }
 }
