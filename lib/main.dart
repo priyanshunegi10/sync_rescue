@@ -1,13 +1,21 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:sync_rescue/features/sos_rescue/views/home_page.dart';
+import 'package:provider/provider.dart';
+import 'package:sync_rescue/features/auth/view_models/auth_view_model.dart';
+import 'package:sync_rescue/features/auth/views/welcome_screen.dart';
+
 import 'package:sync_rescue/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [ChangeNotifierProvider(create: (_) => AuthViewModel())],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -18,7 +26,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'synch rescue',
       theme: ThemeData(textTheme: GoogleFonts.latoTextTheme()),
-      home: HomePage(),
+      home: WelcomeScreen(),
     );
   }
 }
