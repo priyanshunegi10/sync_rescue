@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:sync_rescue/core/constants/app_string.dart';
+import 'package:sync_rescue/core/theme/app_colors.dart';
 import 'package:sync_rescue/core/widgets/custom_button.dart';
 import 'package:sync_rescue/features/auth/views/login_screen.dart';
 import 'package:sync_rescue/features/auth/views/signup_screen.dart';
@@ -16,12 +18,12 @@ class WelcomeScreen extends StatelessWidget {
           children: [
             Positioned.fill(
               child: DecoratedBox(
-                decoration: const BoxDecoration(color: Colors.black),
+                decoration: const BoxDecoration(color: AppColors.blackColor),
                 child: Image.asset(
                   "assets/images/fire.png",
                   fit: BoxFit.cover,
 
-                  color: Colors.black.withOpacity(0.4),
+                  color: AppColors.blackColor.withOpacity(0.4),
                   colorBlendMode: BlendMode.darken,
                 ),
               ),
@@ -34,23 +36,23 @@ class WelcomeScreen extends StatelessWidget {
                   Expanded(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Padding(
                           padding: EdgeInsets.only(top: 200),
                           child: Text(
-                            "SYNC RESCUE",
+                            AppString.syncRescu,
                             style: TextStyle(
                               fontSize: 35,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: AppColors.whiteColor,
                             ),
                           ),
                         ),
                         SizedBox(height: 8),
                         Text(
-                          "NEIGHBORHOOD AID NETWORK",
+                          AppString.neighborhood,
                           style: TextStyle(
-                            color: Colors.white70,
+                            color: AppColors.greyColorsShade600,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -64,7 +66,7 @@ class WelcomeScreen extends StatelessWidget {
                     width: double.infinity,
                     // height: MediaQuery.of(context).size.height / 3,
                     decoration: const BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.whiteColor,
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(30),
                         topRight: Radius.circular(30),
@@ -74,9 +76,9 @@ class WelcomeScreen extends StatelessWidget {
                       child: Column(
                         children: [
                           CustomButton(
-                            color: Colors.black,
-                            title: "Log in",
-                            textColor: Colors.white,
+                            color: AppColors.blackColor,
+                            title: AppString.login,
+                            textColor: AppColors.whiteColor,
                             onpress: () {
                               Navigator.push(
                                 context,
@@ -96,23 +98,23 @@ class WelcomeScreen extends StatelessWidget {
                                 ),
                               );
                             },
-                            color: Colors.white,
-                            title: "sign up",
-                            textColor: Colors.black,
+                            color: AppColors.whiteColor,
+                            title: AppString.signup,
+                            textColor: AppColors.blackColor,
                           ),
                           SizedBox(height: 40),
-                          Text("By continuing, you agree to Sync rescue's"),
+                          Text(AppString.continuing),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               TextButton(
                                 onPressed: () {},
-                                child: Text("Privacy Policy"),
+                                child: Text(AppString.privacyPolicy),
                               ),
-                              Text("and"),
+                              Text(AppString.and),
                               TextButton(
                                 onPressed: () {},
-                                child: Text("Terms of Use."),
+                                child: Text(AppString.terms),
                               ),
                             ],
                           ),

@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_rescue/features/auth/view_models/auth_view_model.dart';
 import 'package:sync_rescue/features/auth/views/welcome_screen.dart';
-
 import 'package:sync_rescue/firebase_options.dart';
 
 void main() async {
