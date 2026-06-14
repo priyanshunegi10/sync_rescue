@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:sync_rescue/core/errors/app_exception.dart';
 import 'package:sync_rescue/features/auth/models/user_model.dart';
 import 'package:sync_rescue/features/auth/services/firebase_auth_services.dart';
 
@@ -38,7 +39,7 @@ class AuthViewModel extends ChangeNotifier {
         _errorMessage = "Something went wrong. User is null.";
         return false;
       }
-    } catch (e) {
+    } on AuthException catch (e) {
       _errorMessage = e.toString();
       return false;
     } finally {
@@ -65,7 +66,7 @@ class AuthViewModel extends ChangeNotifier {
         _errorMessage = "Something went wrong. user is null";
         return false;
       }
-    } catch (e) {
+    } on AuthException catch (e) {
       _errorMessage = e.toString();
       return false;
     } finally {
