@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:sync_rescue/core/errors/app_exception.dart';
 import 'package:sync_rescue/features/auth/models/user_model.dart';
 
 class FirebaseAuthServices {
@@ -30,14 +31,21 @@ class FirebaseAuthServices {
 
         return newUser;
       } else {
-        throw Exception(
+        throw AuthException(
           "Firebase returned a null user without throwing an error ",
         );
       }
     } on FirebaseAuthException catch (e) {
-      throw Exception(e.message ?? 'Authentication failed');
+      if (e.code == 'user-not-found') {
+        throw AuthException("User not found");
+      } else if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+        throw AuthException("Email or password are wrong ");
+      } else if (e.code == 'email-already-in-use') {
+        throw AuthException("This email is already in use please go and login");
+      }
+      throw AuthException(e.message ?? 'Authentication failed');
     } catch (e) {
-      throw Exception('Database error: ${e.toString()}');
+      throw AuthException('Database error: $e');
     }
   }
 
@@ -62,17 +70,22 @@ class FirebaseAuthServices {
         if (doc.exists && doc.data() != null) {
           return UserModel.fromJson(doc.data() as Map<String, dynamic>);
         } else {
-          throw Exception(
+          throw AuthException(
             "Account found, but profile data is missing in database.",
           );
         }
       } else {
-        throw Exception("Firebase returned null user.");
+        throw AuthException("Firebase returned null user.");
       }
     } on FirebaseAuthException catch (e) {
-      throw Exception(e.message ?? 'Authentication failed');
+      if (e.code == 'user-not-found') {
+        throw AuthException("User not found");
+      } else if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+        throw AuthException("Email or password are wrong ");
+      }
+      throw AuthException(e.message ?? 'Authentication failed');
     } catch (e) {
-      throw Exception('Database error: ${e.toString()}');
+      throw AuthException('Database error: $e');
     }
   }
 
