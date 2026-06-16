@@ -17,11 +17,11 @@ class FirestoreSosServices {
           .doc(sosRequest.requestId)
           .set(sosRequest.toMap());
     } on FirebaseException catch (e) {
-      throw DataBaseException(
+      throw DatabaseException(
         e.message ?? 'Firestore database failed to respond.',
       );
     } catch (e) {
-      throw DataBaseException('Failed to process SOS request: $e');
+      throw DatabaseException('Failed to process SOS request: $e');
     }
   }
 
@@ -37,11 +37,11 @@ class FirestoreSosServices {
         'longitude': newLongitude,
       });
     } on FirebaseException catch (e) {
-      throw DataBaseException(
+      throw DatabaseException(
         e.message ?? 'Firestore database failed to respond.',
       );
     } catch (e) {
-      throw DataBaseException('Failed to update live location: $e');
+      throw DatabaseException('Failed to update live location: $e');
     }
   }
 
@@ -52,11 +52,11 @@ class FirestoreSosServices {
         'status': newStatus,
       });
     } on FirebaseException catch (e) {
-      throw DataBaseException(
+      throw DatabaseException(
         e.message ?? 'Firestore database failed to respond.',
       );
     } catch (e) {
-      throw DataBaseException('Failed to update new status: $e');
+      throw DatabaseException('Failed to update new status: $e');
     }
   }
 
@@ -80,11 +80,11 @@ class FirestoreSosServices {
 
       return null;
     } on FirebaseException catch (e) {
-      throw DataBaseException(
+      throw DatabaseException(
         e.message ?? 'Failed to read active SOS from Firestore.',
       );
     } catch (e) {
-      throw DataBaseException('An unknown error occurred: $e');
+      throw DatabaseException('An unknown error occurred: $e');
     }
   }
 
@@ -107,11 +107,11 @@ class FirestoreSosServices {
           .map((doc) => SosRequestModel.fromMap(doc.data()))
           .toList();
     } on FirebaseException catch (e) {
-      throw DataBaseException(
+      throw DatabaseException(
         e.message ?? 'Failed to fetch pending emergencies.',
       );
     } catch (e) {
-      throw DataBaseException(
+      throw DatabaseException(
         "An unknown error occurred while fetching emergencies: $e",
       );
     }
@@ -123,7 +123,7 @@ class FirestoreSosServices {
       User? currentUser = _auth.currentUser;
 
       if (currentUser == null) {
-        throw DataBaseException('User not authenticated. Cannot accept SOS.');
+        throw DatabaseException('User not authenticated. Cannot accept SOS.');
       }
 
       await _db.collection('sos_alerts').doc(requestId).update({
@@ -131,13 +131,18 @@ class FirestoreSosServices {
         'volunteerId': currentUser.uid,
       });
     } on FirebaseException catch (e) {
-      throw DataBaseException(
+      throw DatabaseException(
         e.message ?? 'Failed to accept pending emergencies.',
       );
     } catch (e) {
-      throw DataBaseException(
+      throw DatabaseException(
         'An unknown error occurred while accepting SOS: $e',
       );
     }
   }
+
+
+
+
+
 }

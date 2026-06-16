@@ -20,6 +20,6 @@ class NetworkException extends AppException {
   NetworkException(super.message);
 }
 
-class DataBaseException extends AppException {
-  DataBaseException(super.message);
+class DatabaseException extends AppException {
+  DatabaseException(super.message);
 }
