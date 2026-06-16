@@ -1,12 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class SosRequestModel {
-  String requestId;
-  String victimId;
-  String? volunteerId;
-  double longitude;
-  double latitude;
-  String emergencyType;
-  String status;
-  DateTime? timestamp;
+  final String requestId;
+  final String victimId;
+  final String? volunteerId;
+  final double longitude;
+  final double latitude;
+  final String emergencyType;
+  final String status;
+  final DateTime? timestamp;
 
   SosRequestModel({
     required this.requestId,
@@ -25,10 +27,10 @@ class SosRequestModel {
       'volunteerId': volunteerId,
       'victimId': victimId,
       'longitude': longitude,
-      'Latitude': latitude,
+      'latitude': latitude,
       'emergencyType': emergencyType,
       'status': status,
-      'timestamp': timestamp?.toIso8601String(),
+      'timestamp': FieldValue.serverTimestamp(),
     };
   }
 
@@ -42,7 +44,7 @@ class SosRequestModel {
       emergencyType: map['emergencyType'],
       status: map['status'],
       timestamp: map['timestamp'] != null
-          ? DateTime.tryParse(map['timestamp'])
+          ? (map['timestamp'] as Timestamp).toDate()
           : null,
     );
   }

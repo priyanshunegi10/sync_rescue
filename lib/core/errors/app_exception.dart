@@ -8,7 +8,6 @@ abstract class AppException implements Exception {
 
 // All Exception
 
-
 class LocationException extends AppException {
   LocationException(super.message);
 }
@@ -19,4 +18,8 @@ class AuthException extends AppException {
 
 class NetworkException extends AppException {
   NetworkException(super.message);
+}
+
+class DataBaseException extends AppException {
+  DataBaseException(super.message);
 }
