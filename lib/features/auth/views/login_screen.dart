@@ -8,7 +8,7 @@ import 'package:sync_rescue/core/widgets/custom_extra_login_app_container.dart';
 import 'package:sync_rescue/core/widgets/custom_text_field.dart';
 import 'package:sync_rescue/features/auth/view_models/auth_view_model.dart';
 import 'package:sync_rescue/features/auth/views/signup_screen.dart';
-import 'package:sync_rescue/features/sos_rescue/views/home_page.dart';
+import 'package:sync_rescue/features/sos_rescue/views/victum_page_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

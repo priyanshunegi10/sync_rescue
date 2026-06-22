@@ -16,12 +16,14 @@ class SosViewModel extends ChangeNotifier {
 
   bool _isLoading = false;
   String _errorMessage = "";
+  Position? _currentPosition;
 
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
 
   SosRequestModel? _currentSosRequest;
   SosRequestModel? get currentSosRequest => _currentSosRequest;
+  Position? get currentPosition => _currentPosition;
 
   Future<bool> triggerSos(String emergencyType) async {
     try {
@@ -36,7 +38,7 @@ class SosViewModel extends ChangeNotifier {
       }
 
       final position = await _locationServices.getCurrentLocation();
-
+      _currentPosition = position;
       final String requestId = const Uuid().v4();
 
       final requestModel = SosRequestModel(
@@ -49,6 +51,7 @@ class SosViewModel extends ChangeNotifier {
       );
 
       await _db.sendSosRequest(requestModel);
+      _currentSosRequest = requestModel;
       _startLiveTracking(requestId);
       return true;
     } on DatabaseException catch (e) {
@@ -81,6 +84,8 @@ class SosViewModel extends ChangeNotifier {
                 position.latitude,
                 position.longitude,
               );
+
+              _currentPosition = position;
             } catch (e) {
               if (kDebugMode) {
                 print("Live tracking update failed: $e");
@@ -102,6 +107,7 @@ class SosViewModel extends ChangeNotifier {
       notifyListeners();
 
       await _db.updateSosStatus(requestId, "cancelled");
+      _currentSosRequest = null;
 
       stopLiveTracking();
       return true;
@@ -137,7 +143,6 @@ class SosViewModel extends ChangeNotifier {
       _errorMessage = e.message;
       return false;
     } on NetworkException catch (e) {
-      // Agar tune NetworkException custom banaya hai toh ye theek hai
       _errorMessage = e.message;
       return false;
     } catch (e) {

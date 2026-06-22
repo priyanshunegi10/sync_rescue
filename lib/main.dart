@@ -6,7 +6,10 @@ import 'package:provider/provider.dart';
 import 'package:sync_rescue/core/theme/app_colors.dart';
 import 'package:sync_rescue/features/auth/view_models/auth_view_model.dart';
 import 'package:sync_rescue/features/auth/views/welcome_screen.dart';
-import 'package:sync_rescue/features/sos_rescue/views/home_page.dart';
+import 'package:sync_rescue/features/sos_rescue/view_models/rescuer_view_model.dart';
+import 'package:sync_rescue/features/sos_rescue/view_models/sos_view_model.dart';
+import 'package:sync_rescue/features/sos_rescue/views/rescuer_page_screen.dart';
+import 'package:sync_rescue/features/sos_rescue/views/victum_page_screen.dart';
 import 'package:sync_rescue/firebase_options.dart';
 
 void main() async {
@@ -14,7 +17,11 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   runApp(
     MultiProvider(
-      providers: [ChangeNotifierProvider(create: (_) => AuthViewModel())],
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthViewModel()),
+        ChangeNotifierProvider(create: (_) => SosViewModel()),
+        ChangeNotifierProvider(create: (_) => RescuerViewModel()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -28,6 +35,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Sync Rescue',
       theme: ThemeData(textTheme: GoogleFonts.latoTextTheme()),
+
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
