@@ -73,7 +73,7 @@ class RescuerViewModel extends ChangeNotifier {
 
       _activeRescue = null;
       await fetchPendingEmergencies();
-
+      
       return true;
     } on DatabaseException catch (e) {
       _errorMessage = e.message;

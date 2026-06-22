@@ -160,4 +160,8 @@ class FirestoreSosServices {
       throw DatabaseException('An unknown error occurred');
     }
   }
+
+  Stream<DocumentSnapshot> getRescueStatusStream(String requestId) {
+    return _db.collection('sos_requests').doc(requestId).snapshots();
+  }
 }

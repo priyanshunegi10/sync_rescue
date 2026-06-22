@@ -130,6 +130,46 @@ class _RescuerPageScreenState extends State<RescuerPageScreen> {
           ],
         ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: rescuerViewModel.activeRescue != null
+          ? Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: FloatingActionButton.extended(
+                backgroundColor: Colors.blue.shade800,
+                onPressed: () async {
+                  bool success = await context
+                      .read<RescuerViewModel>()
+                      .completeSosRequest();
+                  if (success && context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Mission Completed! Back to Radar."),
+                      ),
+                    );
+                  }
+                },
+                icon: rescuerViewModel.isLoading
+                    ? const SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 3,
+                        ),
+                      )
+                    : const Icon(Icons.verified_user, color: Colors.white),
+                label: const Text(
+                  "COMPLETE RESCUE",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ),
+            )
+          : null,
     );
   }
 }

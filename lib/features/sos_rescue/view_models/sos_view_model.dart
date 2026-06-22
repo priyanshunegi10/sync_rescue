@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
@@ -13,6 +14,7 @@ class SosViewModel extends ChangeNotifier {
   final LocationServices _locationServices = LocationServices();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   StreamSubscription<Position>? _locationSubscription;
+  StreamSubscription<DocumentSnapshot>? _statusSubscription;
 
   bool _isLoading = false;
   String _errorMessage = "";
@@ -53,6 +55,7 @@ class SosViewModel extends ChangeNotifier {
       await _db.sendSosRequest(requestModel);
       _currentSosRequest = requestModel;
       _startLiveTracking(requestId);
+      _listenToRescueStatus(requestId);
       return true;
     } on DatabaseException catch (e) {
       _errorMessage = e.message;
@@ -86,6 +89,7 @@ class SosViewModel extends ChangeNotifier {
               );
 
               _currentPosition = position;
+              notifyListeners();
             } catch (e) {
               if (kDebugMode) {
                 print("Live tracking update failed: $e");
@@ -98,6 +102,9 @@ class SosViewModel extends ChangeNotifier {
   void stopLiveTracking() {
     _locationSubscription?.cancel();
     _locationSubscription = null;
+
+    _statusSubscription?.cancel();
+    _statusSubscription = null;
   }
 
   Future<bool> cancelActiveSos(String requestId) async {
@@ -110,6 +117,7 @@ class SosViewModel extends ChangeNotifier {
       _currentSosRequest = null;
 
       stopLiveTracking();
+
       return true;
     } on DatabaseException catch (e) {
       _errorMessage = e.message;
@@ -138,6 +146,7 @@ class SosViewModel extends ChangeNotifier {
       _currentSosRequest = activeRequest;
 
       _startLiveTracking(activeRequest.requestId);
+      _listenToRescueStatus(activeRequest.requestId);
       return true;
     } on DatabaseException catch (e) {
       _errorMessage = e.message;
@@ -152,5 +161,26 @@ class SosViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void _listenToRescueStatus(String requestId) {
+    _statusSubscription?.cancel();
+
+    _statusSubscription = _db.getRescueStatusStream(requestId).listen((
+      snapshot,
+    ) {
+      if (snapshot.exists) {
+        final data = snapshot.data() as Map<String, dynamic>?;
+        final status = data?['status'];
+
+        if (status == 'resolved') {
+          _currentSosRequest = null;
+          stopLiveTracking();
+          _statusSubscription?.cancel();
+          _errorMessage = "You have been marked as rescued!";
+          notifyListeners();
+        }
+      }
+    });
   }
 }
