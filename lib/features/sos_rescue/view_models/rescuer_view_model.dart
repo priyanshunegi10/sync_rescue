@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:sync_rescue/core/errors/app_exception.dart';
 import 'package:sync_rescue/features/sos_rescue/models/sos_request_model.dart';
@@ -5,7 +8,7 @@ import 'package:sync_rescue/features/sos_rescue/services/firestore_sos_services.
 
 class RescuerViewModel extends ChangeNotifier {
   final FirestoreSosServices _db = FirestoreSosServices();
-
+  StreamSubscription<DocumentSnapshot>? _activeMissionSubscription;
   String _errorMessage = "";
   bool _isLoading = false;
 
@@ -50,6 +53,8 @@ class RescuerViewModel extends ChangeNotifier {
         (req) => req.requestId == requestId,
       );
       _pendingEmergencies.removeWhere((req) => req.requestId == requestId);
+
+      listenToActiveMission(requestId);
       return true;
     } on DatabaseException catch (e) {
       _errorMessage = e.message;
@@ -73,7 +78,7 @@ class RescuerViewModel extends ChangeNotifier {
 
       _activeRescue = null;
       await fetchPendingEmergencies();
-      
+
       return true;
     } on DatabaseException catch (e) {
       _errorMessage = e.message;
@@ -85,5 +90,41 @@ class RescuerViewModel extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void listenToActiveMission(String requestId) {
+    _activeMissionSubscription?.cancel();
+
+    _activeMissionSubscription = _db.getRescueStatusStream(requestId).listen((
+      snapshot,
+    ) {
+      // SCENARIO 1: Agar document hi delete ho gaya (Yaani victim ne cancel/delete kar diya)
+      if (!snapshot.exists) {
+        print("🚨 DOCUMENT GAYAB (Deleted)! Mission aborted.");
+        _activeRescue = null;
+        _activeMissionSubscription?.cancel();
+        _errorMessage = "The victim has cancelled this SOS request.";
+        fetchPendingEmergencies();
+        notifyListeners();
+        return; // Execution yahi rok do
+      }
+
+      // SCENARIO 2: Agar document database me zinda hai, toh status padho
+      final data = snapshot.data() as Map<String, dynamic>?;
+      final status = data?['status'];
+
+      print("🚨 CURRENT STATUS IN DB: $status");
+
+      if (status == 'cancelled' || status == 'resolved') {
+        print("🚨 STATUS CHANGED TO $status! Freeing Rescuer...");
+        _activeRescue = null;
+        _activeMissionSubscription?.cancel();
+        _errorMessage = status == 'cancelled'
+            ? "The victim has cancelled this SOS request."
+            : "Rescue confirmed by victim!";
+        fetchPendingEmergencies();
+        notifyListeners();
+      }
+    });
   }
 }

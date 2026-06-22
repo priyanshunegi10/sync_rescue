@@ -162,6 +162,6 @@ class FirestoreSosServices {
   }
 
   Stream<DocumentSnapshot> getRescueStatusStream(String requestId) {
-    return _db.collection('sos_requests').doc(requestId).snapshots();
+    return _db.collection('sos_alerts').doc(requestId).snapshots();
   }
 }

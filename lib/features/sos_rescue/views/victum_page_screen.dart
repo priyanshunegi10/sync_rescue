@@ -27,7 +27,16 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final sosViewModel = context.watch<SosViewModel>();
-
+    if (sosViewModel.errorMessage == "You have been marked as rescued!") {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("🚀 Mission Accomplished! You are safe now."),
+            backgroundColor: Colors.green,
+          ),
+        );
+      });
+    }
     return Scaffold(
       body: SizedBox(
         height: double.infinity,
