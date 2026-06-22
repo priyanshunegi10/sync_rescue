@@ -8,7 +8,6 @@ import 'package:sync_rescue/features/auth/view_models/auth_view_model.dart';
 import 'package:sync_rescue/features/auth/views/welcome_screen.dart';
 import 'package:sync_rescue/features/sos_rescue/view_models/rescuer_view_model.dart';
 import 'package:sync_rescue/features/sos_rescue/view_models/sos_view_model.dart';
-import 'package:sync_rescue/features/sos_rescue/views/rescuer_page_screen.dart';
 import 'package:sync_rescue/features/sos_rescue/views/victum_page_screen.dart';
 import 'package:sync_rescue/firebase_options.dart';
 
