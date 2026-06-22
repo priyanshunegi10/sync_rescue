@@ -1,10 +1,10 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_rescue/core/theme/app_colors.dart';
 import 'package:sync_rescue/features/sos_rescue/view_models/rescuer_view_model.dart';
+import 'package:sync_rescue/features/sos_rescue/widget/emergency_action_sheet.dart';
 
 class RescuerPageScreen extends StatefulWidget {
   const RescuerPageScreen({super.key});
@@ -70,33 +70,57 @@ class _RescuerPageScreenState extends State<RescuerPageScreen> {
                               userAgentPackageName: 'com.sync_rescue.app',
                             ),
                             MarkerLayer(
-                              markers: rescuerViewModel.fetchAllEmergencies.map((
-                                emergency,
-                              ) {
-                                return Marker(
-                                  width: 50.0,
-                                  height: 50.0,
-                                  point: LatLng(
-                                    emergency.latitude,
-                                    emergency.longitude,
-                                  ),
-
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      if (kDebugMode) {
-                                        print(
-                                          "Clicked Victim ID: ${emergency.requestId}",
-                                        );
-                                      }
-                                    },
-                                    child: const Icon(
-                                      Icons.location_on,
-                                      color: Colors.red,
-                                      size: 45.0,
-                                    ),
-                                  ),
-                                );
-                              }).toList(),
+                              markers: rescuerViewModel.activeRescue != null
+                                  ? [
+                                      Marker(
+                                        width: 60.0,
+                                        height: 60.0,
+                                        point: LatLng(
+                                          rescuerViewModel
+                                              .activeRescue!
+                                              .latitude,
+                                          rescuerViewModel
+                                              .activeRescue!
+                                              .longitude,
+                                        ),
+                                        child: const Icon(
+                                          Icons.person_pin_circle,
+                                          color: Colors.blue,
+                                          size: 50.0,
+                                        ),
+                                      ),
+                                    ]
+                                  : rescuerViewModel.fetchAllEmergencies.map((
+                                      emergency,
+                                    ) {
+                                      return Marker(
+                                        width: 50.0,
+                                        height: 50.0,
+                                        point: LatLng(
+                                          emergency.latitude,
+                                          emergency.longitude,
+                                        ),
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            showModalBottomSheet(
+                                              context: context,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              builder: (context) =>
+                                                  EmergencyActionSheet(
+                                                    emergency: emergency,
+                                                    viewModel: rescuerViewModel,
+                                                  ),
+                                            );
+                                          },
+                                          child: const Icon(
+                                            Icons.location_on,
+                                            color: Colors.red,
+                                            size: 45.0,
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
                             ),
                           ],
                         ),

@@ -141,8 +141,23 @@ class FirestoreSosServices {
     }
   }
 
+  // completeSosRequest
 
+  Future<void> completeSosRequest(String requestId) async {
+    try {
+      User? currentUser = _auth.currentUser;
 
+      if (currentUser == null) {
+        throw DatabaseException('User not authenticated. Cannot accept SOS.');
+      }
 
-
+      await _db.collection('sos_alerts').doc(requestId).update({
+        'status': 'resolved',
+      });
+    } on FirebaseException catch (e) {
+      throw DatabaseException(e.message ?? '');
+    } catch (e) {
+      throw DatabaseException('An unknown error occurred');
+    }
+  }
 }

@@ -8,11 +8,14 @@ class RescuerViewModel extends ChangeNotifier {
 
   String _errorMessage = "";
   bool _isLoading = false;
+
   List<SosRequestModel> _pendingEmergencies = [];
+  SosRequestModel? _activeRescue;
 
   String get errorMessage => _errorMessage;
   bool get isLoading => _isLoading;
   List<SosRequestModel> get fetchAllEmergencies => _pendingEmergencies;
+  SosRequestModel? get activeRescue => _activeRescue;
 
   Future<bool> fetchPendingEmergencies() async {
     try {
@@ -43,8 +46,34 @@ class RescuerViewModel extends ChangeNotifier {
       _errorMessage = "";
       notifyListeners();
       await _db.acceptSosRequest(requestId);
-
+      _activeRescue = _pendingEmergencies.firstWhere(
+        (req) => req.requestId == requestId,
+      );
       _pendingEmergencies.removeWhere((req) => req.requestId == requestId);
+      return true;
+    } on DatabaseException catch (e) {
+      _errorMessage = e.message;
+      return false;
+    } catch (e) {
+      _errorMessage = "An unexpected error occurred: $e";
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<bool> completeSosRequest() async {
+    try {
+      _isLoading = true;
+      _errorMessage = "";
+      notifyListeners();
+
+      await _db.completeSosRequest(_activeRescue!.requestId);
+
+      _activeRescue = null;
+      await fetchPendingEmergencies();
+
       return true;
     } on DatabaseException catch (e) {
       _errorMessage = e.message;
