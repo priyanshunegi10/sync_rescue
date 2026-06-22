@@ -100,7 +100,6 @@ class RescuerViewModel extends ChangeNotifier {
     ) {
       // SCENARIO 1: Agar document hi delete ho gaya (Yaani victim ne cancel/delete kar diya)
       if (!snapshot.exists) {
-        print("🚨 DOCUMENT GAYAB (Deleted)! Mission aborted.");
         _activeRescue = null;
         _activeMissionSubscription?.cancel();
         _errorMessage = "The victim has cancelled this SOS request.";
@@ -113,10 +112,7 @@ class RescuerViewModel extends ChangeNotifier {
       final data = snapshot.data() as Map<String, dynamic>?;
       final status = data?['status'];
 
-      print("🚨 CURRENT STATUS IN DB: $status");
-
       if (status == 'cancelled' || status == 'resolved') {
-        print("🚨 STATUS CHANGED TO $status! Freeing Rescuer...");
         _activeRescue = null;
         _activeMissionSubscription?.cancel();
         _errorMessage = status == 'cancelled'

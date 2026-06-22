@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:sync_rescue/core/theme/app_colors.dart';
+import 'package:sync_rescue/core/utils/map_utils.dart';
 import 'package:sync_rescue/features/sos_rescue/view_models/rescuer_view_model.dart';
 import 'package:sync_rescue/features/sos_rescue/widget/emergency_action_sheet.dart';
 
@@ -132,42 +133,44 @@ class _RescuerPageScreenState extends State<RescuerPageScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: rescuerViewModel.activeRescue != null
-          ? Padding(
-              padding: const EdgeInsets.only(bottom: 10),
-              child: FloatingActionButton.extended(
-                backgroundColor: Colors.blue.shade800,
-                onPressed: () async {
-                  bool success = await context
-                      .read<RescuerViewModel>()
-                      .completeSosRequest();
-                  if (success && context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Mission Completed! Back to Radar."),
-                      ),
-                    );
-                  }
-                },
-                icon: rescuerViewModel.isLoading
-                    ? const SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 3,
-                        ),
-                      )
-                    : const Icon(Icons.verified_user, color: Colors.white),
-                label: const Text(
-                  "COMPLETE RESCUE",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FloatingActionButton.extended(
+                  heroTag: "nav_btn",
+                  backgroundColor: Colors.green.shade700,
+                  onPressed: () {
+                    final target = rescuerViewModel.activeRescue!;
+                    MapUtils.openMap(target.latitude, target.longitude);
+                  },
+                  icon: const Icon(Icons.navigation, color: Colors.white),
+                  label: const Text(
+                    "START NAVIGATION",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
+
+                const SizedBox(height: 10),
+
+                FloatingActionButton.extended(
+                  heroTag: "complete_btn",
+                  backgroundColor: Colors.blue.shade800,
+                  onPressed: () async {
+                    await context.read<RescuerViewModel>().completeSosRequest();
+                  },
+                  icon: const Icon(Icons.verified_user, color: Colors.white),
+                  label: const Text(
+                    "COMPLETE RESCUE",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
             )
           : null,
     );
