@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:sync_rescue/core/errors/app_exception.dart';
+import 'package:sync_rescue/core/services/local_storage_service.dart';
 import 'package:sync_rescue/features/sos_rescue/models/sos_request_model.dart';
 import 'package:sync_rescue/features/sos_rescue/services/firestore_sos_services.dart';
 import 'package:sync_rescue/features/sos_rescue/services/location_services.dart';
@@ -12,6 +13,8 @@ import 'package:uuid/uuid.dart';
 class SosViewModel extends ChangeNotifier {
   final FirestoreSosServices _db = FirestoreSosServices();
   final LocationServices _locationServices = LocationServices();
+  final LocalStorageService _localStorage = LocalStorageService();
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   StreamSubscription<Position>? _locationSubscription;
   StreamSubscription<DocumentSnapshot>? _statusSubscription;
@@ -53,8 +56,11 @@ class SosViewModel extends ChangeNotifier {
       );
 
       await _db.sendSosRequest(requestModel);
+      await _localStorage.saveActiveMission(requestId);
       _currentSosRequest = requestModel;
+
       _startLiveTracking(requestId);
+
       _listenToRescueStatus(requestId);
       return true;
     } on DatabaseException catch (e) {
@@ -115,6 +121,7 @@ class SosViewModel extends ChangeNotifier {
 
       await _db.updateSosStatus(requestId, "cancelled");
       _currentSosRequest = null;
+      await _localStorage.clearActiveMission();
 
       stopLiveTracking();
 
@@ -137,17 +144,23 @@ class SosViewModel extends ChangeNotifier {
       _errorMessage = "";
       notifyListeners();
 
-      final activeRequest = await _db.getActiveSosRequest();
+      final saveMissionId = await _localStorage.getActiveMission();
 
-      if (activeRequest == null) {
-        return false;
+      if (saveMissionId != null) {
+        _currentSosRequest = SosRequestModel(
+          requestId: saveMissionId,
+          victimId: _auth.currentUser?.uid ?? 'unknown',
+          longitude: _currentPosition?.longitude ?? 0.0,
+          latitude: _currentPosition?.latitude ?? 0.0,
+          emergencyType: 'recovered_offline',
+          status: 'pending',
+        );
+
+        _startLiveTracking(saveMissionId);
+        _listenToRescueStatus(saveMissionId);
+        return true;
       }
-
-      _currentSosRequest = activeRequest;
-
-      _startLiveTracking(activeRequest.requestId);
-      _listenToRescueStatus(activeRequest.requestId);
-      return true;
+      return false;
     } on DatabaseException catch (e) {
       _errorMessage = e.message;
       return false;
@@ -168,13 +181,14 @@ class SosViewModel extends ChangeNotifier {
 
     _statusSubscription = _db.getRescueStatusStream(requestId).listen((
       snapshot,
-    ) {
+    ) async {
       if (snapshot.exists) {
         final data = snapshot.data() as Map<String, dynamic>?;
         final status = data?['status'];
 
         if (status == 'resolved') {
           _currentSosRequest = null;
+          await _localStorage.clearActiveMission();
           stopLiveTracking();
           _statusSubscription?.cancel();
           _errorMessage = "You have been marked as rescued!";

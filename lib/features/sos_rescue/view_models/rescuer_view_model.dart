@@ -8,7 +8,7 @@ import 'package:sync_rescue/features/sos_rescue/services/firestore_sos_services.
 
 class RescuerViewModel extends ChangeNotifier {
   final FirestoreSosServices _db = FirestoreSosServices();
-  final LocalStorageService _localStorage = LocalStorageService();
+  final LocalStorageService _localStorage = LocalStorageService(); 
 
   StreamSubscription<DocumentSnapshot>? _activeMissionSubscription;
   String _errorMessage = "";
